@@ -1,6 +1,7 @@
 let myLibrary = [];
 
-window.addEventListener("load", function (e) {
+// When page loads → populate default books and render
+window.addEventListener("load", function () {
   populateStorage();
   render();
 });
@@ -16,6 +17,9 @@ function populateStorage() {
     );
     myLibrary.push(book1);
     myLibrary.push(book2);
+
+    // 🔧 FIX: render is already called on load,
+    // but keeping this ensures it updates after populating
     render();
   }
 }
@@ -25,22 +29,26 @@ const author = document.getElementById("author");
 const pages = document.getElementById("pages");
 const check = document.getElementById("check");
 
-//check the right input from forms and if its ok -> add the new book (object in array)
-//via Book function and start render function
 function submit() {
-  if (
-    title.value == null ||
-    title.value == "" ||
-    pages.value == null ||
-    pages.value == ""
-  ) {
+  // 🔧 FIX: Added author validation (was missing before)
+  if (title.value === "" || author.value === "" || pages.value === "") {
     alert("Please fill all fields!");
-    return false;
-  } else {
-    let book = new Book(title.value, title.value, pages.value, check.checked);
-    library.push(book);
-    render();
+    return;
   }
+
+  // 🔧 FIX: Author was incorrectly set as title before
+  let book = new Book(title.value, author.value, pages.value, check.checked);
+
+  // 🔧 FIX: Was using "library.push" (wrong variable name)
+  myLibrary.push(book);
+
+  render();
+
+  // 🔧 Improvement: Clear form after submission
+  title.value = "";
+  author.value = "";
+  pages.value = "";
+  check.checked = false;
 }
 
 function Book(title, author, pages, check) {
@@ -53,12 +61,14 @@ function Book(title, author, pages, check) {
 function render() {
   let table = document.getElementById("display");
   let rowsNumber = table.rows.length;
-  //delete old table
-  for (let n = rowsNumber - 1; n > 0; n-- {
+
+  // 🔧 FIX: Missing ")" caused entire script to fail
+  for (let n = rowsNumber - 1; n > 0; n--) {
     table.deleteRow(n);
   }
-  //insert updated row and cells
+
   let length = myLibrary.length;
+
   for (let i = 0; i < length; i++) {
     let row = table.insertRow(1);
     let titleCell = row.insertCell(0);
@@ -66,35 +76,35 @@ function render() {
     let pagesCell = row.insertCell(2);
     let wasReadCell = row.insertCell(3);
     let deleteCell = row.insertCell(4);
+
     titleCell.innerHTML = myLibrary[i].title;
     authorCell.innerHTML = myLibrary[i].author;
     pagesCell.innerHTML = myLibrary[i].pages;
 
-    //add and wait for action for read/unread button
     let changeBut = document.createElement("button");
-    changeBut.id = i;
     changeBut.className = "btn btn-success";
-    wasReadCell.appendChild(changeBut);
-    let readStatus = "";
-    if (myLibrary[i].check == false) {
-      readStatus = "Yes";
-    } else {
-      readStatus = "No";
-    }
-    changeBut.innerText = readStatus;
 
+    // 🔧 FIX: Logic was reversed before
+    changeBut.innerText = myLibrary[i].check ? "Yes" : "No";
+
+    wasReadCell.appendChild(changeBut);
+
+    // Toggle read status
     changeBut.addEventListener("click", function () {
       myLibrary[i].check = !myLibrary[i].check;
       render();
     });
 
-    //add delete button to every row and render again
     let delButton = document.createElement("button");
-    delBut.id = i + 5;
-    deleteCell.appendChild(delBut);
-    delBut.className = "btn btn-warning";
-    delBut.innerHTML = "Delete";
-    delBut.addEventListener("clicks", function () {
+
+    // 🔧 FIX: Variable name was incorrect (delBut vs delButton)
+    delButton.className = "btn btn-warning";
+    delButton.innerHTML = "Delete";
+
+    deleteCell.appendChild(delButton);
+
+    // 🔧 FIX: Event name was "clicks" (invalid)
+    delButton.addEventListener("click", function () {
       alert(`You've deleted title: ${myLibrary[i].title}`);
       myLibrary.splice(i, 1);
       render();
