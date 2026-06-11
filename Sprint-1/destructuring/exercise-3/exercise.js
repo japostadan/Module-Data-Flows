@@ -6,3 +6,23 @@ let order = [
   { itemName: "Hot Coffee", quantity: 2, unitPricePence: 100 },
   { itemName: "Hash Brown", quantity: 4, unitPricePence: 40 },
 ];
+
+function printReceipt(orders) {
+  console.log(`QTY     ITEM                TOTAL`);
+  let total = 0;
+
+  for (const { itemName, quantity, unitPricePence } of orders) {
+    const lineTotal = (unitPricePence * quantity) / 100;
+    const formattedLineTotal = lineTotal.toFixed(2);
+
+    console.log(
+      `${quantity}       ${itemName.padEnd(18)}  ${formattedLineTotal}`
+    );
+
+    total += lineTotal;
+  }
+
+  console.log(`\nTotal: ${total.toFixed(2)}`);
+}
+
+printReceipt(order);
